@@ -9,27 +9,27 @@
 template <typename T>
 class LinkedList : public List<T> {
 public:
-    LinkedList() : head_(nullptr), tail_(nullptr), size_(0) {}
+    LinkedList() : head_(nullptr), size_(0) {}
 
     void addFront(T* value) override {
         Node<T>* fresh = new Node<T>(value);
         fresh->next = head_;
         head_ = fresh;
-        if (tail_ == nullptr) {
-            tail_ = fresh;          // first node is both head and tail
-        }
         ++size_;
     }
 
     void addBack(T* value) override {
         Node<T>* fresh = new Node<T>(value);
-        if (tail_ == nullptr) {
-            head_ = fresh;          // first node is both head and tail
-            tail_ = fresh;
-        } else {
-            tail_->next = fresh;
-            tail_ = fresh;
+        if (head_ == nullptr) {
+            head_ = fresh;
+            size_++;
+            return;
         }
+        Node<T>* current = head_;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = fresh;
         ++size_;
     }
 
@@ -40,9 +40,6 @@ public:
         }
         Node<T>* doomed = head_;
         head_ = head_->next;
-        if (head_ == nullptr) {
-            tail_ = nullptr;        // list is empty again
-        }
         delete doomed->data;
         delete doomed;
         --size_;
@@ -98,9 +95,15 @@ public:
             return;
         }
         Node<T>* new_node = new Node<T>(value);
+        if (position == 0) {
+            new_node->next = head_;
+            head_ = new_node;
+            size_++;
+            return;
+        }
         Node<T>* current = head_;
         for (int i = 0; i < size_; ++i) {
-            if (i+1 == position) {  //curent is node before target
+            if ((i+1) == position) {  //curent is node before target
                 Node<T>* temp = current->next;
                 current->next = new_node;
                 new_node->next = temp;
@@ -119,7 +122,10 @@ public:
             return;
         }
         Node<T>* current = head_;
-
+        if (position == 0) {
+            deleteFront();
+            return;
+        }
         for (int i = 0; i < position-1; ++i) {
             current = current->next;
         }
@@ -128,6 +134,7 @@ public:
         current->next = current->next->next;
         delete doomed->data;
         delete doomed;
+        size_--;
     }
 
     void reverse() override {
@@ -147,7 +154,6 @@ public:
             std::cout << "LinkedList has only 1 element. Cant Reverse" << std::endl;
             return;
         }
-        tail_ = head_;
         while (next_node != nullptr) {
             next_node = current_node->next;
             current_node->next = previous_node;
@@ -167,15 +173,16 @@ public:
             }
             if (head_ == nullptr) {
                 head_ = other_linked_list->head_;
-                tail_ = other_linked_list->tail_;
             }
             else {
-                tail_->next = other_linked_list->head_;
-                tail_ = other_linked_list->tail_;
-                size_ += other_linked_list->size_;
+                Node<T>* current = head_;
+                while (current->next != nullptr) {
+                    current = current->next;
+                }
+                current->next = other_linked_list->head_;
             }
+            size_ += other_linked_list->size_;
             other_linked_list->head_ = nullptr;
-            other_linked_list->tail_ = nullptr;
             other_linked_list->size_ = 0;
         }
         else {
@@ -186,6 +193,5 @@ public:
 
 private:
     Node<T>* head_;
-    Node<T>* tail_;
     int size_;
 };
