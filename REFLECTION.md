@@ -23,3 +23,4 @@
    at line 46 I call reverse and it would break the game because Carl plays a reverse and so if we dont reverse our list our order of players will be incorrect. 
 
 
+gi
