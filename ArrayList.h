@@ -79,6 +79,81 @@ public:
         }
     }
 
+        void addAnywhere(int position, T* value) override {
+        if (position == 0) {
+            addFront(value);
+        }
+        else if (position == size_) {
+            addBack(value);
+        }
+        else if (position > size_ || position < 0) {
+            std::cout << "Invalid addAnywhere Array Index." << std::endl;
+            return;
+        }
+        else {
+            for (int i = size_; i > position; --i) {
+                data_[i] = data_[i - 1];
+            }
+            data_[position] = value;
+            size_++;
+        }
+    }
+
+    void deleteAnywhere(int position) override {
+        if (position == 0) {
+            deleteFront();
+        }
+        else if (position >= size_ || position < 0) {
+            std::cout << "Invalid  deleteAnywhere Array Index." << std::endl;
+            return;
+        }
+        else {
+            T* doomed = data_[position];
+            delete doomed;
+            for (int i = position; i < size_ - 1; ++i) {
+                data_[i] = data_[i + 1];
+            }
+            --size_;
+        }
+    }
+
+    void reverse() override {
+        T* temp;
+        int j = size_ - 1;
+        int i = 0;
+        while (i < j) {
+            temp = data_[i];
+            data_[i] = data_[j];
+            data_[j] = temp;
+            j--;
+            i++;
+        }
+    }
+
+    void concat(List<T>* other) override {
+        ArrayList<T>* other_array_list = dynamic_cast<ArrayList<T>*>(other);
+        if (other_array_list != nullptr) {
+            if (other_array_list->isEmpty()) {
+                std::cout << "ArrayList to concat is empty." << std::endl;
+                return;
+            }
+            if (size_ + other_array_list->size_ > CAPACITY) {
+                std::cout << "ArrayList cannot concat due to CAPACITY." << std::endl;
+                return;
+            }
+            for (int i = 0; i < other_array_list->size_; ++i) {
+                data_[size_] = other_array_list->data_[i];
+                other_array_list->data_[i] = nullptr;
+                size_++;
+            }
+            other_array_list->size_ = 0;
+        }
+        else {
+            std::cout << "ArrayList not found. Cant Concat" << std::endl;
+            return;
+        }
+    }
+
 
 private:
     static const int CAPACITY = 20;
